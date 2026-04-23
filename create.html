@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>AnonShare — Create Post</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header>
+    <div class="header-inner">
+      <h1>🕶️ AnonShare</h1>
+      <p>Create an anonymous post</p>
+      <a href="index.html" class="btn-secondary">← Back to Feed</a>
+    </div>
+  </header>
+  <main>
+    <div class="form-container">
+      <h2>New Post</h2>
+      <p class="form-note">Your identity is never shown publicly.</p>
+      <div class="form-group">
+        <label>Title *</label>
+        <input type="text" id="title" placeholder="Give your post a title..." />
+      </div>
+      <div class="form-group">
+        <label>Description *</label>
+        <textarea id="body" placeholder="Write anything you want. No length limit..." rows="8"></textarea>
+      </div>
+      <div class="form-group">
+        <label>Photo (optional)</label>
+        <input type="file" id="photo" accept="image/*" />
+      </div>
+      <div class="form-group">
+        <label>Secret Question *</label>
+        <input type="text" id="secret_question" placeholder="e.g. What is my favourite color?" />
+        <small>Only someone who answers this correctly can request to message you.</small>
+      </div>
+      <div class="form-group">
+        <label>Secret Answer *</label>
+        <input type="text" id="secret_answer" placeholder="e.g. blue" />
+      </div>
+      <div class="form-group">
+        <label>Your Contact Info *</label>
+        <input type="text" id="contact_info" placeholder="e.g. @yourtelegram or your@email.com" />
+        <small>Only revealed after you accept a request.</small>
+      </div>
+      <div class="form-group">
+        <label>Your Email (private) *</label>
+        <input type="email" id="author_email" placeholder="you@gmail.com" />
+        <small>Used only to notify you. Never shown publicly.</small>
+      </div>
+      <button class="btn-primary full-width" onclick="createPost()">Publish Anonymously</button>
+      <p id="post-feedback" class="feedback"></p>
+    </div>
+  </main>
+  <script type="module" src="app.js"></script>
+</body>
+</html>

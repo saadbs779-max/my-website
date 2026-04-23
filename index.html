@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>AnonShare — Share Freely</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header>
+    <div class="header-inner">
+      <h1>🕶️ AnonShare</h1>
+      <p>Share your thoughts. Stay anonymous.</p>
+      <a href="create.html" class="btn-primary">+ New Post</a>
+    </div>
+  </header>
+  <main>
+    <div id="posts-container">
+      <p class="loading">Loading posts...</p>
+    </div>
+  </main>
+  <div id="desc-modal" class="modal hidden">
+    <div class="modal-box">
+      <button class="close-btn" onclick="closeModal('desc-modal')">✕</button>
+      <h2 id="modal-title"></h2>
+      <p id="modal-body"></p>
+    </div>
+  </div>
+  <div id="msg-modal" class="modal hidden">
+    <div class="modal-box">
+      <button class="close-btn" onclick="closeModal('msg-modal')">✕</button>
+      <h2>Message the Author</h2>
+      <p id="question-text" class="question"></p>
+      <input type="text" id="answer-input" placeholder="Your answer..." />
+      <button class="btn-primary" onclick="submitAnswer()">Submit Answer</button>
+      <p id="answer-feedback" class="feedback"></p>
+    </div>
+  </div>
+  <div id="status-modal" class="modal hidden">
+    <div class="modal-box">
+      <button class="close-btn" onclick="closeModal('status-modal')">✕</button>
+      <h2>Request Status</h2>
+      <p id="status-text" class="question"></p>
+    </div>
+  </div>
+  <script type="module" src="app.js"></script>
+</body>
+</html>
