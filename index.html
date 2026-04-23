@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
@@ -11,7 +11,10 @@
     <div class="header-inner">
       <h1>🕶️ AnonShare</h1>
       <p>Share your thoughts. Stay anonymous.</p>
-      <a href="create.html" class="btn-primary">+ New Post</a>
+      <div class="header-actions">
+        <button class="theme-toggle" onclick="toggleTheme()">🌙 Dark</button>
+        <a href="create.html" class="btn-primary">+ New Post</a>
+      </div>
     </div>
   </header>
   <main>
@@ -19,6 +22,8 @@
       <p class="loading">Loading posts...</p>
     </div>
   </main>
+
+  <!-- DESCRIPTION MODAL -->
   <div id="desc-modal" class="modal hidden">
     <div class="modal-box">
       <button class="close-btn" onclick="closeModal('desc-modal')">✕</button>
@@ -26,6 +31,8 @@
       <p id="modal-body"></p>
     </div>
   </div>
+
+  <!-- MESSAGE MODAL -->
   <div id="msg-modal" class="modal hidden">
     <div class="modal-box">
       <button class="close-btn" onclick="closeModal('msg-modal')">✕</button>
@@ -36,6 +43,8 @@
       <p id="answer-feedback" class="feedback"></p>
     </div>
   </div>
+
+  <!-- STATUS MODAL -->
   <div id="status-modal" class="modal hidden">
     <div class="modal-box">
       <button class="close-btn" onclick="closeModal('status-modal')">✕</button>
@@ -43,6 +52,22 @@
       <p id="status-text" class="question"></p>
     </div>
   </div>
+
+  <!-- COMMENTS MODAL -->
+  <div id="comments-modal" class="modal hidden">
+    <div class="modal-box">
+      <button class="close-btn" onclick="closeModal('comments-modal')">✕</button>
+      <h2>Comments</h2>
+      <div id="comments-list"></div>
+      <div class="comment-form">
+        <input type="text" id="comment-name" placeholder="Your name (optional — leave blank for Anonymous)" />
+        <textarea id="comment-body" placeholder="Write a comment..." rows="3"></textarea>
+        <button class="btn-primary" onclick="submitComment()">Post Comment</button>
+        <p id="comment-feedback" class="feedback"></p>
+      </div>
+    </div>
+  </div>
+
   <script type="module" src="app.js"></script>
 </body>
 </html>

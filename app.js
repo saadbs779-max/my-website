@@ -12,6 +12,28 @@ function getPage() {
   return window.location.pathname.split('/').pop()
 }
 
+// DARK/LIGHT MODE
+window.toggleTheme = function() {
+  const html = document.documentElement
+  const btn = document.querySelector('.theme-toggle')
+  if (html.getAttribute('data-theme') === 'dark') {
+    html.setAttribute('data-theme', 'light')
+    btn.textContent = '☀️ Light'
+    localStorage.setItem('theme', 'light')
+  } else {
+    html.setAttribute('data-theme', 'dark')
+    btn.textContent = '🌙 Dark'
+    localStorage.setItem('theme', 'dark')
+  }
+}
+
+// Load saved theme
+const savedTheme = localStorage.getItem('theme') || 'dark'
+document.documentElement.setAttribute('data-theme', savedTheme)
+const themeBtn = document.querySelector('.theme-toggle')
+if (themeBtn) themeBtn.textContent = savedTheme === 'dark' ? '🌙 Dark' : '☀️ Light'
+
+// INDEX PAGE
 if (getPage() === 'index.html' || getPage() === '') {
   loadPosts()
 }
@@ -29,21 +51,59 @@ async function loadPosts() {
     return
   }
 
-  container.innerHTML = data.map(post => `
-    <div class="post-card">
+  container.innerHTML = ''
+
+  for (const post of data) {
+    const likesRes = await supabase.from('reactions').select('id', { count: 'exact' }).eq('post_id', post.id).eq('type', 'like')
+    const dislikesRes = await supabase.from('reactions').select('id', { count: 'exact' }).eq('post_id', post.id).eq('type', 'dislike')
+    const commentsRes = await supabase.from('comments').select('id', { count: 'exact' }).eq('post_id', post.id)
+
+    const likes = likesRes.count || 0
+    const dislikes = dislikesRes.count || 0
+    const commentCount = commentsRes.count || 0
+
+    const card = document.createElement('div')
+    card.className = 'post-card'
+    card.innerHTML = `
       ${post.image_url ? `<img src="${post.image_url}" alt="post image" />` : ''}
       <div class="post-card-body">
         <p class="post-date">${new Date(post.created_at).toLocaleDateString()}</p>
         <h3>${post.title}</h3>
         <div class="post-card-actions">
           <button onclick="openDescription('${post.id}', '${post.title}')">📖 Read</button>
-          <button onclick="openMessage('${post.id}')">💬 Message</button>
+          <button onclick="openComments('${post.id}')">💬 ${commentCount}</button>
+          <button onclick="openMessage('${post.id}')">✉️ Message</button>
+        </div>
+        <div class="reactions">
+          <button class="react-btn" id="like-${post.id}" onclick="react('${post.id}', 'like')">👍 <span id="like-count-${post.id}">${likes}</span></button>
+          <button class="react-btn" id="dislike-${post.id}" onclick="react('${post.id}', 'dislike')">👎 <span id="dislike-count-${post.id}">${dislikes}</span></button>
         </div>
       </div>
-    </div>
-  `).join('')
+    `
+    container.appendChild(card)
+  }
 }
 
+// REACTIONS
+window.react = async function(postId, type) {
+  await supabase.from('reactions').insert({ post_id: postId, type })
+
+  const likesRes = await supabase.from('reactions').select('id', { count: 'exact' }).eq('post_id', postId).eq('type', 'like')
+  const dislikesRes = await supabase.from('reactions').select('id', { count: 'exact' }).eq('post_id', postId).eq('type', 'dislike')
+
+  document.getElementById('like-count-' + postId).textContent = likesRes.count || 0
+  document.getElementById('dislike-count-' + postId).textContent = dislikesRes.count || 0
+
+  if (type === 'like') {
+    document.getElementById('like-' + postId).classList.add('liked')
+    document.getElementById('dislike-' + postId).classList.remove('disliked')
+  } else {
+    document.getElementById('dislike-' + postId).classList.add('disliked')
+    document.getElementById('like-' + postId).classList.remove('liked')
+  }
+}
+
+// OPEN DESCRIPTION
 window.openDescription = async function(postId, title) {
   const { data } = await supabase.from('posts').select('body').eq('id', postId).single()
   document.getElementById('modal-title').textContent = title
@@ -51,6 +111,72 @@ window.openDescription = async function(postId, title) {
   document.getElementById('desc-modal').classList.remove('hidden')
 }
 
+// COMMENTS
+let currentCommentPostId = null
+
+window.openComments = async function(postId) {
+  currentCommentPostId = postId
+  document.getElementById('comment-name').value = ''
+  document.getElementById('comment-body').value = ''
+  document.getElementById('comment-feedback').textContent = ''
+  document.getElementById('comments-modal').classList.remove('hidden')
+  loadComments(postId)
+}
+
+async function loadComments(postId) {
+  const { data } = await supabase
+    .from('comments')
+    .select('*')
+    .eq('post_id', postId)
+    .order('created_at', { ascending: true })
+
+  const list = document.getElementById('comments-list')
+
+  if (!data || data.length === 0) {
+    list.innerHTML = '<p class="empty" style="padding:1rem 0">No comments yet. Be the first!</p>'
+    return
+  }
+
+  list.innerHTML = data.map(c => `
+    <div class="comment-item">
+      <div class="comment-author">${c.name || 'Anonymous'}</div>
+      <div class="comment-text">${c.body}</div>
+      <div class="comment-date">${new Date(c.created_at).toLocaleString()}</div>
+    </div>
+  `).join('')
+}
+
+window.submitComment = async function() {
+  const name = document.getElementById('comment-name').value.trim()
+  const body = document.getElementById('comment-body').value.trim()
+  const feedback = document.getElementById('comment-feedback')
+
+  if (!body) {
+    feedback.textContent = 'Please write a comment first.'
+    feedback.className = 'feedback error'
+    return
+  }
+
+  const { error } = await supabase.from('comments').insert({
+    post_id: currentCommentPostId,
+    name: name || null,
+    body
+  })
+
+  if (error) {
+    feedback.textContent = 'Something went wrong. Try again.'
+    feedback.className = 'feedback error'
+    return
+  }
+
+  feedback.textContent = '✅ Comment posted!'
+  feedback.className = 'feedback success'
+  document.getElementById('comment-body').value = ''
+  document.getElementById('comment-name').value = ''
+  loadComments(currentCommentPostId)
+}
+
+// MESSAGE
 let currentPostId = null
 
 window.openMessage = async function(postId) {
@@ -72,7 +198,7 @@ window.submitAnswer = async function() {
   if (userAnswer.toLowerCase() !== data.secret_answer.toLowerCase()) { feedback.textContent = '❌ Wrong answer. Try again!'; feedback.className = 'feedback error'; return }
   const readerToken = generateToken()
   const { error } = await supabase.from('requests').insert({ post_id: currentPostId, status: 'pending', contact_info: data.contact_info, reader_token: readerToken })
-  if (error) { feedback.textContent = 'Something went wrong. Please try again.'; feedback.className = 'feedback error'; return }
+  if (error) { feedback.textContent = 'Something went wrong.'; feedback.className = 'feedback error'; return }
   localStorage.setItem('reader_token_' + currentPostId, readerToken)
   const managementLink = `${window.location.origin}/manage.html?token=${data.management_token}`
   await fetch('/api/notify', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ authorEmail: data.author_email, postTitle: data.title, managementLink }) })
@@ -93,6 +219,7 @@ async function checkRequestStatus(postId, readerToken) {
 
 window.closeModal = function(id) { document.getElementById(id).classList.add('hidden') }
 
+// CREATE POST
 if (getPage() === 'create.html') {
   window.createPost = async function() {
     const title = document.getElementById('title').value.trim()
@@ -121,6 +248,7 @@ if (getPage() === 'create.html') {
   }
 }
 
+// MANAGE PAGE
 if (getPage() === 'manage.html') {
   const params = new URLSearchParams(window.location.search)
   const token = params.get('token')

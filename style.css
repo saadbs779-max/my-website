@@ -1,6 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=Mulish:wght@300;400;500;600&display=swap');
 
-:root {
+:root[data-theme="dark"] {
   --bg: #0f1117;
   --surface: #1a1d27;
   --surface2: #22263a;
@@ -14,12 +14,31 @@
   --yellow: #fbbf24;
   --radius: 12px;
 }
+
+:root[data-theme="light"] {
+  --bg: #f4f6fb;
+  --surface: #ffffff;
+  --surface2: #eef0f7;
+  --border: #d0d5e8;
+  --text: #1a1d27;
+  --muted: #6b7099;
+  --accent: #5b8dee;
+  --accent-hover: #4a7de0;
+  --green: #059669;
+  --red: #dc2626;
+  --yellow: #d97706;
+  --radius: 12px;
+}
+
 * { box-sizing: border-box; margin: 0; padding: 0; }
-body { font-family: 'Mulish', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; line-height: 1.6; }
+body { font-family: 'Mulish', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; line-height: 1.6; transition: background 0.3s, color 0.3s; }
 header { background: var(--surface); border-bottom: 1px solid var(--border); padding: 1.5rem 2rem; }
 .header-inner { max-width: 900px; margin: 0 auto; display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; }
 header h1 { font-family: 'Syne', sans-serif; font-size: 1.5rem; font-weight: 800; }
 header p { flex: 1; color: var(--muted); font-size: 0.9rem; }
+.header-actions { display: flex; gap: 0.6rem; align-items: center; }
+.theme-toggle { background: var(--surface2); border: 1px solid var(--border); color: var(--text); border-radius: 8px; padding: 0.6rem 1rem; font-family: 'Mulish', sans-serif; font-size: 0.85rem; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+.theme-toggle:hover { border-color: var(--accent); }
 .btn-primary { background: var(--accent); color: white; border: none; border-radius: 8px; padding: 0.6rem 1.3rem; font-family: 'Mulish', sans-serif; font-size: 0.9rem; font-weight: 600; cursor: pointer; text-decoration: none; display: inline-block; transition: background 0.2s; }
 .btn-primary:hover { background: var(--accent-hover); }
 .btn-primary.full-width { width: 100%; text-align: center; padding: 0.9rem; font-size: 1rem; }
@@ -34,10 +53,15 @@ main { max-width: 900px; margin: 2rem auto; padding: 0 1.5rem 4rem; }
 .post-card img { width: 100%; height: 180px; object-fit: cover; display: block; }
 .post-card-body { padding: 1.1rem; }
 .post-card h3 { font-family: 'Syne', sans-serif; font-size: 1rem; font-weight: 700; margin-bottom: 0.8rem; }
-.post-card-actions { display: flex; gap: 0.6rem; flex-wrap: wrap; }
-.post-card-actions button { flex: 1; padding: 0.5rem 0.7rem; font-size: 0.8rem; border-radius: 7px; border: 1px solid var(--border); background: var(--surface2); color: var(--muted); cursor: pointer; font-family: 'Mulish', sans-serif; font-weight: 600; transition: all 0.2s; }
+.post-card-actions { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 0.8rem; }
+.post-card-actions button { flex: 1; padding: 0.5rem 0.4rem; font-size: 0.78rem; border-radius: 7px; border: 1px solid var(--border); background: var(--surface2); color: var(--muted); cursor: pointer; font-family: 'Mulish', sans-serif; font-weight: 600; transition: all 0.2s; }
 .post-card-actions button:hover { border-color: var(--accent); color: var(--accent); }
 .post-date { font-size: 0.75rem; color: var(--muted); margin-bottom: 0.6rem; }
+.reactions { display: flex; gap: 0.6rem; margin-top: 0.5rem; }
+.react-btn { display: flex; align-items: center; gap: 0.3rem; background: var(--surface2); border: 1px solid var(--border); border-radius: 20px; padding: 0.3rem 0.8rem; font-size: 0.82rem; font-weight: 600; cursor: pointer; font-family: 'Mulish', sans-serif; color: var(--muted); transition: all 0.2s; }
+.react-btn:hover { border-color: var(--accent); color: var(--accent); }
+.react-btn.liked { border-color: var(--green); color: var(--green); background: rgba(52,211,153,0.1); }
+.react-btn.disliked { border-color: var(--red); color: var(--red); background: rgba(248,113,113,0.1); }
 .form-container { max-width: 600px; margin: 0 auto; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 2rem; }
 .form-container h2 { font-family: 'Syne', sans-serif; font-size: 1.4rem; font-weight: 800; margin-bottom: 0.4rem; }
 .form-note { font-size: 0.85rem; color: var(--muted); margin-bottom: 1.5rem; padding-bottom: 1.5rem; border-bottom: 1px solid var(--border); }
@@ -53,11 +77,20 @@ main { max-width: 900px; margin: 2rem auto; padding: 0 1.5rem 4rem; }
 .modal-box h2 { font-family: 'Syne', sans-serif; font-size: 1.2rem; font-weight: 700; margin-bottom: 1rem; }
 .modal-box p { font-size: 0.92rem; color: var(--muted); line-height: 1.6; }
 .close-btn { position: absolute; top: 1rem; right: 1rem; background: var(--surface2); border: 1px solid var(--border); color: var(--muted); border-radius: 6px; width: 2rem; height: 2rem; cursor: pointer; font-size: 0.85rem; }
+.close-btn:hover { color: var(--text); }
 .question { background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 0.8rem 1rem; margin-bottom: 1rem; font-size: 0.92rem; color: var(--text) !important; }
-.modal-box input { width: 100%; background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 0.7rem 1rem; color: var(--text); font-family: 'Mulish', sans-serif; font-size: 0.9rem; outline: none; margin-bottom: 1rem; }
+.modal-box input, .modal-box textarea { width: 100%; background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 0.7rem 1rem; color: var(--text); font-family: 'Mulish', sans-serif; font-size: 0.9rem; outline: none; margin-bottom: 0.8rem; transition: border-color 0.2s; }
+.modal-box input:focus, .modal-box textarea:focus { border-color: var(--accent); }
+.modal-box textarea { resize: vertical; }
 .feedback { margin-top: 0.8rem; font-size: 0.88rem; font-weight: 600; min-height: 1.2rem; }
 .feedback.success { color: var(--green); }
 .feedback.error { color: var(--red); }
+.comment-form { margin-top: 1.2rem; border-top: 1px solid var(--border); padding-top: 1.2rem; }
+.comment-item { padding: 0.8rem 0; border-bottom: 1px solid var(--border); }
+.comment-item:last-child { border-bottom: none; }
+.comment-author { font-size: 0.8rem; font-weight: 700; color: var(--accent); margin-bottom: 0.3rem; }
+.comment-text { font-size: 0.88rem; color: var(--text); line-height: 1.5; }
+.comment-date { font-size: 0.72rem; color: var(--muted); margin-top: 0.2rem; }
 .request-card { background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; padding: 1.2rem; margin-bottom: 1rem; }
 .request-card h4 { font-size: 0.9rem; font-weight: 600; margin-bottom: 0.4rem; }
 .request-card p { font-size: 0.85rem; color: var(--muted); margin-bottom: 0.8rem; }
